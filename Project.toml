@@ -1,0 +1,19 @@
+name = "SmallCombinatorics"
+uuid = "4c2fb5cd-5fa8-4952-858b-935ef2e5e854"
+authors = ["matthias314"]
+version = "0.1.0"
+
+[deps]
+SmallCollections = "2b935e18-93d6-40ac-ae34-fe54c09f00e1"
+
+[compat]
+BitIntegers = "0.3"
+SmallCollections = "0.4.1 - 0.5"
+julia = "1.10"
+
+[extras]
+BitIntegers = "c3b6d118-76ef-56ca-8cc7-ebb389d030a1"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "BitIntegers"]
