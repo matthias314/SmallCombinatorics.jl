@@ -1,9 +1,15 @@
 # SmallCombinatorics.jl
 
-This package provides functions for enumerative combinatorics
-that are based on the fast, non-allocating types offered by the package
+This package provides functions for enumerative combinatorics. It was formerly a submodule of
 [SmallCollections.jl](https://github.com/matthias314/SmallCollections.jl).
-It was formerly a submodule of `SmallCollections`.
+
+The functions in `SmallCombinatorics` are often much faster than their counterparts
+in other combinatorics packages. This is achieved by using the fast, non-allocating
+container types offered by `SmallCollections`. These types have a maximal capacity,
+which implies there are bounds on the input parameters for each function. At present,
+these bounds are hard-coded. For example, the function `permutations(n)` can produce
+permutations only for `n ≤ 16`.
+
 So far, the list of implemented functions is fairly short, but hopefully it will grow.
 The full documentation  for `SmallCombinatorics` is available
 [here](https://matthias314.github.io/SmallCombinatorics.jl/).
