@@ -1,7 +1,7 @@
 name = "SmallCombinatorics"
 uuid = "4c2fb5cd-5fa8-4952-858b-935ef2e5e854"
 authors = ["matthias314"]
-version = "0.1.0"
+version = "0.1.1-DEV"
 
 [deps]
 SmallCollections = "2b935e18-93d6-40ac-ae34-fe54c09f00e1"
