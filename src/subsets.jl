@@ -283,16 +283,18 @@ end
 end
 
 """
-    subsets(s::SmallBitSet, k::Integer)
+    subsets(s::Union{SmallBitSet, AbstractSmallSet}, k::Integer)
     subsets(n::Integer, k::Integer)
 
 In the first form, return an iterator that yields all `k`-element subsets of the set `s`.
-The element type is the type of `s`.
+The element type of the iterator is a `SmallBitSet` or `SmallSet`.
 If `k` is negative or larger than `length(s)`, then the iterator is empty.
 
 In the second form the set `s` is taken to be `SmallBitSet(1:n)`.
 
-See also [`subsets(::Integer)`](@ref), [`setcompositions_parity`](@ref setcompositions_parity(::Vararg{Integer,N}) where N).
+See also [`subsets(::Integer)`](@ref),
+[`combinations`](@ref combinations(::Integer, ::Integer)),
+[`setcompositions_parity`](@ref setcompositions_parity(::Vararg{Integer,N}) where N).
 
 # Example
 ```jldoctest
@@ -309,15 +311,24 @@ julia> subsets(3, 2) |> collect
  SmallBitSet([1, 3])
  SmallBitSet([2, 3])
 
+julia> subsets(MutableSmallSet{4}('a':'c'), 2) |> collect
+3-element Vector{SmallSet{4, Char}}:
+ SmallSet{4}(['a', 'b'])
+ SmallSet{4}(['a', 'c'])
+ SmallSet{4}(['b', 'c'])
+
 julia> subsets(3, 4) |> collect
 SmallBitSet{UInt64}[]
 ```
 """
+subsets(::Union{SmallBitSet, AbstractSmallSet, Integer}, ::Integer)
+
 function subsets(n::Integer, k::Integer)
     n >= 0 || error("first argument must be non-negative")
     n <= bitsize(UInt) || error("at most $(bitsize(UInt)) elements supported")
     Generator(first∘first, SetCompositions(missing, (k, n-k)))
-end,
+end
+
 function subsets(s::SmallBitSet, k::Integer)
     Generator(first∘first, SetCompositions(s, (k, length(s)-k)))
 end
@@ -329,3 +340,61 @@ IteratorEltype(::Type{<:Subsets2}) = HasEltype()
 
 eltype(::Type{Subsets2Int}) = SmallBitSet{UInt}
 eltype(::Type{Subsets2{S}}) where S <: SmallBitSet = S
+
+subsets(s::AbstractSmallSet, k::Integer) = combinations(s, k)
+
+# combinations
+
+export combinations
+
+"""
+    combinations(n::Integer, k::Integer)
+    combinations(s::Union{SmallBitSet, AbstractSmallSet}, k::Integer)
+    combinations(s::Union{AbstractFixedVector, AbstractSmallVector}, k::Integer)
+    combinations(s::PackedVector, k::Integer)
+
+Return an iterator that yields all combinations of `k` elements from the given collection,
+whose elements are assumed to be distinct.
+If the first argument is an integer `n`, then the collection is taken to be `SmallBitSet(1:n)`.
+If `k` is negative or exceeds the length of the collection, then the iterator is empty.
+
+With an integer or a set as first argument, `combinations` is the same as `subsets`.
+If the collection is an `AbstractFixedVector{N,T}` or `AbstractSmallVector{N,T}`, then the
+element type of the iterator is `SmallVector{N,T}`. If the collection is a `PackedVector`,
+then the elements of the iterator are of the same type.
+
+The version with an integer or a `SmallBitSet` as first argument is the fastest.
+
+See also [`subsets`](@ref subsets(::Integer, ::Integer)).
+
+# Example
+```jldoctest
+julia> combinations(MutableFixedVector{4}('a':'d'), 2) |> collect
+6-element Vector{SmallVector{4, Char}}:
+ ['a', 'b']
+ ['a', 'c']
+ ['b', 'c']
+ ['a', 'd']
+ ['b', 'd']
+ ['c', 'd']
+```
+"""
+combinations(::Union{Integer, SmallBitSet, AbstractSmallSet, AbstractFixedOrSmallOrPackedVector}, ::Integer)
+
+combinations(n::Integer, k::Integer) = subsets(n, k)
+combinations(s::SmallBitSet, k::Integer) = subsets(s, k)
+
+generator(f::F, gen::Generator) where F = Generator(f∘gen.f, gen.iter)
+
+_inbounds_getindex(v::AbstractFixedOrSmallOrPackedVector, ii) = @inbounds v[ii]
+_inbounds_getindex(s::AbstractSmallSet{N,T}, ii) where {N,T} = SmallSet{N,T}(@inbounds values(s)[ii]; unique = true)
+
+combinations(c::Union{AbstractFixedOrSmallOrPackedVector, AbstractSmallSet}, k::Integer) = generator(Fix1(_inbounds_getindex, c), subsets(length(c), k))
+
+const Combinations2{C} = Generator{fieldtype(Subsets2Int, :iter), ComposedFunction{Fix1{typeof(_inbounds_getindex), C}, fieldtype(Subsets2Int, :f)}}
+
+IteratorEltype(::Type{<:Combinations2}) = HasEltype()
+
+eltype(::Type{Combinations2{V}}) where {N, T, V <: AbstractFixedOrSmallVector{N,T}} = SmallVector{N,T}
+eltype(::Type{Combinations2{V}}) where V <: PackedVector = V
+eltype(::Type{Combinations2{S}}) where {N, T, S <: AbstractSmallSet{N,T}} = SmallSet{N,T}

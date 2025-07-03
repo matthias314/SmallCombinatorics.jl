@@ -8,7 +8,7 @@ SmallCollections = "2b935e18-93d6-40ac-ae34-fe54c09f00e1"
 
 [compat]
 BitIntegers = "0.3"
-SmallCollections = "0.4.1 - 0.5"
+SmallCollections = "0.5.0"
 julia = "1.10"
 
 [extras]

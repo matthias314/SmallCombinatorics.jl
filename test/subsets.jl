@@ -155,3 +155,37 @@ end
     @test_inferred eltype(typeof(setcompositions(3, 2))) Tuple{SmallBitSet{UInt}, SmallBitSet{UInt}}
     @test_inferred eltype(typeof(setcompositions(SmallBitSet{UInt8}(1:5), 3, 2))) Tuple{SmallBitSet{UInt8}, SmallBitSet{UInt8}}
 end
+
+@testset "combinations(n,k)" begin
+    k = 3
+    @test_inferred combinations(8, k) subsets(8, k)
+    s = SmallBitSet{UInt16}([2, 3, 5, 7, 8, 10, 12, 13])
+    @test_inferred combinations(s, k) subsets(s, k)
+    t = SmallSet{16,Int16}(s)
+    @test_inferred subsets(t, k) combinations(t, k)
+
+    sitr = subsets(s, k)
+    N = 8
+    T = Int8
+    for C in [SmallSet{N,T}, MutableSmallSet{N,T},
+            FixedVector{N,T}, MutableFixedVector{N,T}, SmallVector{N,T}, MutableSmallVector{N,T},
+            PackedVector{UInt64, 5, Int8}]
+        c = C(s)
+        U = if C <: AbstractSmallSet
+            SmallSet{N,T}
+        elseif C <: Union{AbstractFixedVector, AbstractSmallVector}
+            SmallVector{N,T}
+        elseif C <: PackedVector
+            C
+        else
+            error("impossible")
+        end
+        itr = @inferred combinations(c, k)
+        @test_inferred Base.IteratorEltype(itr) Base.HasEltype()
+        @test_inferred eltype(itr) U
+        @test_inferred length(itr) length(sitr)
+        v = collect(itr)
+        @test eltype(v) == eltype(itr) && length(v) == length(sitr)
+        @test Set(v) == Set(U(t) for t in sitr)
+    end
+end

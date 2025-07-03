@@ -10,11 +10,12 @@ julia> using SmallCollections, $(@__MODULE__)
 """
 module SmallCombinatorics
 
-using Base: Fix2, Generator
+using Base: Fix1, Fix2, Generator
 
 using SmallCollections
 using SmallCollections: bitsize, padtail, unsafe_shl, unsafe_lshr,
-    blsi, blsr, blsmsk, pdep
+    blsi, blsr, blsmsk, pdep,
+    AbstractFixedOrSmallVector, AbstractFixedOrSmallOrPackedVector
 
 _SmallBitSet(mask::U) where U <: Unsigned = convert(SmallBitSet{U}, mask)
 

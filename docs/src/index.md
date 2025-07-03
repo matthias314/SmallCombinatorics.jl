@@ -35,6 +35,12 @@ setcompositions_parity(::Vararg{Integer})
 setcomposition_parity
 ```
 
+## Combinations
+
+```@docs
+combinations(::Integer, ::Integer)
+```
+
 ## Permutations
 
 ```@docs
