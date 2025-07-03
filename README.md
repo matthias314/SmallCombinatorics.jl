@@ -45,7 +45,7 @@ The iterator returned by
 [`subsets`](https://matthias314.github.io/SmallCombinatorics.jl/stable/#SmallCombinatorics.subsets-Tuple{Integer,%20Integer})
 yields each subset as a `SmallBitSet`.
 ```julia
-julia> n = 20; k = 10; @b sum(sum, SmallCombinatorics.subsets($n, $k))
+julia> n = 20; k = 10; @b sum(sum, SmallCombinatorics.combinations($n, $k))
 1.121 ms
 
 julia> n = 20; k = 10; @b sum(sum, Combinatorics.combinations(1:$n, $k))

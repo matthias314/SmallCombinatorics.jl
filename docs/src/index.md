@@ -28,11 +28,16 @@ As discussed in the docstring for `pdep`, performance is much better if the proc
 The same applies to `setcompositions` with more than two parts, even if the first argument is not a `SmallBitSet`.
 
 ```@docs
-subsets(::Integer)
-subsets(::Integer, ::Integer)
+subsets
 setcompositions
 setcompositions_parity(::Vararg{Integer})
 setcomposition_parity
+```
+
+## Combinations
+
+```@docs
+combinations
 ```
 
 ## Permutations
