@@ -329,3 +329,40 @@ IteratorEltype(::Type{<:Subsets2}) = HasEltype()
 
 eltype(::Type{Subsets2Int}) = SmallBitSet{UInt}
 eltype(::Type{Subsets2{S}}) where S <: SmallBitSet = S
+
+# NEW
+
+using Base: Fix1
+using SmallCollections: AbstractFixedOrSmallVector, AbstractFixedOrSmallOrPackedVector
+
+subsets(s::AbstractSmallSet, k::Integer) = combinations(s, k)
+
+# combinations
+
+export combinations
+
+combinations(n::Integer, k::Integer) = subsets(n, k)
+combinations(s::SmallBitSet, k::Integer) = subsets(s, k)
+
+_inbounds_getindex(v, s) = @inbounds v[s]
+
+combinations(v::AbstractFixedOrSmallOrPackedVector, k::Integer) =
+    Generator(Fix1(_inbounds_getindex, v), subsets(length(v), k))
+
+const Combinations2Vector{V} = Generator{Subsets2Int, Fix1{typeof(_inbounds_getindex), V}}
+
+IteratorEltype(::Type{<:Combinations2Vector}) = HasEltype()
+
+eltype(::Type{Combinations2Vector{V}}) where {N, T, V <: AbstractFixedOrSmallVector{N,T}} = SmallVector{N,T}
+eltype(::Type{Combinations2Vector{V}}) where V <: PackedVector = V
+
+_smallset_unique(v::AbstractSmallVector{N,T}) where {N,T} = SmallSet{N,T}(v; unique = true)
+
+combinations(s::AbstractSmallSet{N}, k::Integer) where N =
+    Generator(_smallset_unique, combinations(values(s), k))
+
+const Combinations2SmallSet{N,T} = Generator{Combinations2Vector{SmallVector{N,T}}, typeof(_smallset_unique)}
+
+IteratorEltype(::Type{<:Combinations2SmallSet}) = HasEltype()
+
+eltype(::Type{Combinations2SmallSet{N,T}}) where {N,T} = SmallSet{N,T}
