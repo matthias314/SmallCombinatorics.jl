@@ -4,8 +4,8 @@
 
 export setcompositions, subsets, setcompositions_parity, setcomposition_parity
 
-using Base: @propagate_inbounds, Generator
-import Base: eltype, length, size, IndexStyle, getindex, iterate
+using Base: @propagate_inbounds, Generator, HasEltype
+import Base: eltype, length, size, IndexStyle, getindex, iterate, IteratorEltype
 
 struct SetCompositions{N,S}
     set::S
@@ -49,6 +49,8 @@ function setcompositions_parity(s::SmallBitSet, ks::Integer...)
     any(signbit, ks) && error("part sizes must be non-negative")
     SetCompositions(s, ks)
 end
+
+IteratorEltype(::Type{I}) where I <: SetCompositions = HasEltype()
 
 eltype(::Type{SetCompositions{N,Missing}}) where N = Tuple{NTuple{N,SmallBitSet{UInt}}, Bool}
 eltype(::Type{SetCompositions{N,S}}) where {N, S <: SmallBitSet} = Tuple{NTuple{N,S}, Bool}
@@ -212,6 +214,8 @@ julia> setcompositions(SmallBitSet()) |> collect
 """
 setcompositions(args...) = Generator(first, setcompositions_parity(args...))
 
+IteratorEltype(::Type{Generator{I, typeof(first)}}) where I <: SetCompositions = HasEltype()
+
 eltype(g::Type{Generator{I, typeof(first)}}) where I <: SetCompositions = fieldtype(eltype(I), 1)
 
 struct Subsets{T,S<:SmallBitSet} <: AbstractVector{S}
@@ -318,5 +322,10 @@ function subsets(s::SmallBitSet, k::Integer)
     Generator(first∘first, SetCompositions(s, (k, length(s)-k)))
 end
 
-eltype(::Type{Generator{SetCompositions{2,Missing}, typeof(first∘first)}}) = SmallBitSet{UInt}
-eltype(::Type{Generator{SetCompositions{2,S}, typeof(first∘first)}}) where S <: SmallBitSet = S
+const Subsets2{S} = Generator{SetCompositions{2,S}, typeof(first∘first)}
+const Subsets2Int = Subsets2{Missing}
+
+IteratorEltype(::Type{<:Subsets2}) = HasEltype()
+
+eltype(::Type{Subsets2Int}) = SmallBitSet{UInt}
+eltype(::Type{Subsets2{S}}) where S <: SmallBitSet = S
