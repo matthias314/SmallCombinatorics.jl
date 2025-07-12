@@ -23,7 +23,7 @@ weakcompositions_cumsum
 ## Subsets and set compositions
 
 When used with a `SmallBitSet` as first argument, the following functions internally use
-the function [`pdep`](@ref SmallCollections.pdep).
+the function `SmallCollections.pdep`.
 As discussed in the docstring for `pdep`, performance is much better if the processor supports the BMI2 instruction set.
 The same applies to `setcompositions` with more than two parts, even if the first argument is not a `SmallBitSet`.
 
