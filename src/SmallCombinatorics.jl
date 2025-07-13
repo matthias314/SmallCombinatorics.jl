@@ -12,6 +12,8 @@ module SmallCombinatorics
 
 using Base: Fix1, Fix2, Generator
 
+generator(f::F, gen::Generator) where F = Generator(f∘gen.f, gen.iter)
+
 using SmallCollections
 using SmallCollections: bitsize, padtail, unsafe_shl, unsafe_lshr,
     blsi, blsr, blsmsk, pdep,

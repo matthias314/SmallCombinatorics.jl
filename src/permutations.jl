@@ -4,7 +4,8 @@
 
 export Permutations, permutations, permutations_parity_transposition
 
-import Base: length, eltype, iterate
+using Base: Generator, HasEltype
+import Base: length, eltype, iterate, IteratorEltype
 
 struct Permutations
     n::Int
@@ -40,7 +41,13 @@ julia> permutations(0) |> collect
  0-element SmallVector{16, Int8}
 ```
 """
-permutations(n::Integer) = (p for (p, _, _) in permutations_parity_transposition(n))
+permutations(n::Integer) = Generator(first, permutations_parity_transposition(n))
+
+const Permutations1 = Generator{Permutations, typeof(first)}
+
+IteratorEltype(::Type{Permutations1}) = HasEltype()
+
+eltype(::Type{Permutations1}) = SmallVector{PermN,PermEltype}
 
 """
     permutations_parity_transposition(n::Integer)

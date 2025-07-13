@@ -384,8 +384,6 @@ combinations(::Union{Integer, SmallBitSet, AbstractSmallSet, AbstractFixedOrSmal
 combinations(n::Integer, k::Integer) = subsets(n, k)
 combinations(s::SmallBitSet, k::Integer) = subsets(s, k)
 
-generator(f::F, gen::Generator) where F = Generator(f∘gen.f, gen.iter)
-
 _inbounds_getindex(v::AbstractFixedOrSmallOrPackedVector, ii) = @inbounds v[ii]
 _inbounds_getindex(s::AbstractSmallSet{N,T}, ii) where {N,T} = SmallSet{N,T}(@inbounds values(s)[ii]; unique = true)
 
