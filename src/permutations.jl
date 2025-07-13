@@ -118,3 +118,38 @@ end
     end
     nothing
 end
+
+# permutations of vectors
+
+"""
+    permutations(v::Union{AbstractFixedVector, AbstractSmallVector, PackedVector})
+
+Return an iterator that yields all permutations of the vector `v`, whose elements are assumed to be distinct.
+
+The vector `v` must be of length at most `$PermN`.
+The elements of the iterator are of type `SmallVector{$PermN,T}` where `T` is the element type of `v`,
+but this may change in future versions.
+The identity permutation is returned first.
+
+See also [`permutations(::Integer)`](@ref).
+
+# Example
+```jldoctest
+julia> permutations(FixedVector{3}('a':'c')) |> collect
+6-element Vector{SmallVector{16, Char}}:
+ ['a', 'b', 'c']
+ ['b', 'a', 'c']
+ ['c', 'a', 'b']
+ ['a', 'c', 'b']
+ ['b', 'c', 'a']
+ ['c', 'b', 'a']
+```
+"""
+permutations(v::AbstractFixedOrSmallOrPackedVector) = generator(Fix1(_inbounds_getindex, v), permutations(length(v)))
+
+const PermutationsVector{V} = Generator{fieldtype(Permutations1, :iter), ComposedFunction{Fix1{typeof(_inbounds_getindex), V}, fieldtype(Permutations1, :f)}}
+
+IteratorEltype(::Type{<:PermutationsVector}) = HasEltype()
+
+eltype(::Type{PermutationsVector{V}}) where {N, T, V <: AbstractFixedOrSmallVector{N,T}} = SmallVector{N,T}
+eltype(::Type{PermutationsVector{V}}) where V <: PackedVector = V
