@@ -383,10 +383,6 @@ combinations(::Union{Integer, SmallBitSet, AbstractSmallSet, AbstractFixedOrSmal
 
 combinations(n::Integer, k::Integer) = subsets(n, k)
 combinations(s::SmallBitSet, k::Integer) = subsets(s, k)
-
-_inbounds_getindex(v::AbstractFixedOrSmallOrPackedVector, ii) = @inbounds v[ii]
-_inbounds_getindex(s::AbstractSmallSet{N,T}, ii) where {N,T} = SmallSet{N,T}(@inbounds values(s)[ii]; unique = true)
-
 combinations(c::Union{AbstractFixedOrSmallOrPackedVector, AbstractSmallSet}, k::Integer) = generator(Fix1(_inbounds_getindex, c), subsets(length(c), k))
 
 const Combinations2{C} = Generator{fieldtype(Subsets2Int, :iter), ComposedFunction{Fix1{typeof(_inbounds_getindex), C}, fieldtype(Subsets2Int, :f)}}
