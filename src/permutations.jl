@@ -93,11 +93,11 @@ eltype(::Type{Permutations}) = Tuple{SmallVector{PermN,PermEltype},Int,NTuple{2,
 end
 
 @inline function iterate(perm::Permutations)
-    p = MutableSmallVector{PermN,PermEltype}(1:perm.n)
+    p = MutableSmallVector{PermN}(Base.OneTo(PermEltype(perm.n)))
     (SmallVector(p), false, (0, 0)), (p, zero(p), false)
 end
 
-@inline function iterate(perm::Permutations, (p, c, s)::Tuple{AbstractSmallVector,MutableSmallVector,Bool})
+@inline function iterate(perm::Permutations, (p, c, s)::Tuple{MutableSmallVector,MutableSmallVector,Bool})
     i = 1
     @inbounds while i < perm.n
         if c[i] < i
