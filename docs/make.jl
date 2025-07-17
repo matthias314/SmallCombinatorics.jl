@@ -10,7 +10,6 @@ makedocs(sitename = "SmallCombinatorics.jl",
     modules = [
         SmallCombinatorics,
     ],
-    remotes = nothing,
     pages = [
         "index.md",
     ],
