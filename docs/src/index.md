@@ -46,4 +46,5 @@ combinations(::Integer, ::Integer)
 ```@docs
 permutations
 permutations_parity_transposition
+multiset_permutations
 ```

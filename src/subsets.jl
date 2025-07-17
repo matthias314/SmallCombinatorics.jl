@@ -4,7 +4,7 @@
 
 export setcompositions, subsets, setcompositions_parity, setcomposition_parity
 
-using Base: @propagate_inbounds, Generator, HasEltype
+using Base: Generator, HasEltype
 import Base: eltype, length, size, IndexStyle, getindex, iterate, IteratorEltype
 
 struct SetCompositions{N,S}

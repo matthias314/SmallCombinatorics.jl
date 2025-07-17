@@ -131,7 +131,7 @@ The elements of the iterator are of type `SmallVector{$PermN,T}` where `T` is th
 but this may change in future versions.
 The identity permutation is returned first.
 
-See also [`permutations(::Integer)`](@ref).
+See also [`permutations(::Integer)`](@ref), [`multiset_permutations`](@ref).
 
 # Example
 ```jldoctest
@@ -153,3 +153,75 @@ IteratorEltype(::Type{<:PermutationsVector}) = HasEltype()
 
 eltype(::Type{PermutationsVector{V}}) where {N, T, V <: AbstractFixedOrSmallVector{N,T}} = SmallVector{N,T}
 eltype(::Type{PermutationsVector{V}}) where V <: PackedVector = V
+
+# multiset permutations
+
+export multiset_permutations
+
+struct MultisetPermutations{V<:SmallVector}
+    v::V
+end
+
+"""
+    multiset_permutations(v::AbstractSmallVector{N,T}; [sorted = false]) where {N,T}
+
+Return an iterator over all multiset permutations of `v`, that is, all permutations
+where equal elements are not distinguished. The element type `T` must have an ordering.
+If `sorted` is `true`, then `v` is assumed to be sorted. The iterator yields
+elements of type `SmallVector{N,T}`.
+
+At present, the element type must satisfy `isbitstype(T)`.
+
+See also [`permutations(::AbstractSmallVector)`](@ref), `Base.isbitstype`.
+
+# Example
+```jldoctest
+julia> v = SmallVector{8,Int8}([1, 2, 1]);
+
+julia> multiset_permutations(v) |> collect
+3-element Vector{SmallVector{8, Int8}}:
+ [1, 1, 2]
+ [1, 2, 1]
+ [2, 1, 1]
+```
+"""
+function multiset_permutations(v::AbstractSmallVector{N,T}; sorted = false) where {N,T}
+    isbitstype(T) || error("elements must be of an isbitstype type")
+    w = sorted ? SmallVector(v) : SmallVector(sort(v))
+    MultisetPermutations(w)
+end
+
+@inline function iterate(mp::MultisetPermutations)
+    mp.v, MutableSmallVector(mp.v)
+end
+
+@inline function iterate(mp::MultisetPermutations, w::MutableSmallVector)
+    # Pandita's algorithm
+    isempty(w) && return nothing
+    @inbounds u, _ = pop(w)
+    @inbounds v, _ = popfirst(w)
+    k = findlast(map(>, v, u))
+    k === nothing && return nothing
+    l = findlast(>(@inbounds w[k]), w)::Int
+    @inbounds swap!(w, k, l)
+    @inbounds reverse!(w, k+1)
+    SmallVector(w), w
+end
+
+IteratorEltype(::Type{<:MultisetPermutations}) = HasEltype()
+
+eltype(mp::MultisetPermutations{V}) where V = V
+
+function mp_length(::Type{T}, v::AbstractVector) where T
+    n = i = T(1)
+    for k in T(2):(length(v) % T)
+        @inbounds i = v[k] == v[k-1] ? i+T(1) : T(1)
+        n = div(n*k, i)
+    end
+    n
+end
+
+function length(mp::MultisetPermutations)
+    # 32-bit div is faster, and factorial(12) <= typemax(UInt32)
+    length(mp.v) <= 12 ? mp_length(UInt32, mp.v) % Int : mp_length(Int, mp.v)
+end
