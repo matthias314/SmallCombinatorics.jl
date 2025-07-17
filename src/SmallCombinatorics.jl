@@ -10,7 +10,7 @@ julia> using SmallCollections, $(@__MODULE__)
 """
 module SmallCombinatorics
 
-using Base: Fix1, Fix2, Generator
+using Base: Fix1, Fix2, Generator, @propagate_inbounds
 
 generator(f::F, gen::Generator) where F = Generator(f∘gen.f, gen.iter)
 
