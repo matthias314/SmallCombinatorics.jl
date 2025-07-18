@@ -36,10 +36,14 @@ BitIntegers.@define_integers 440
 
 using SmallCollections: bitsize
 
+using Random: Random, AbstractRNG, SamplerType
+
+Random.rand(rng::AbstractRNG, ::SamplerType{Symbol}) = Symbol(rand(Char, 3)...)
+
 unsigned_types = (UInt8, UInt64, UInt256, UInt440)
 
 if isempty(ARGS)
-    push!(ARGS, "partitions.jl", "compositions.jl", "subsets.jl")
+    push!(ARGS, "partitions.jl", "compositions.jl", "subsets.jl", "permutations.jl")
 end
 
 foreach(include, ARGS)

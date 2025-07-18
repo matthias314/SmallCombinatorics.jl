@@ -1,10 +1,13 @@
 name = "SmallCombinatorics"
 uuid = "4c2fb5cd-5fa8-4952-858b-935ef2e5e854"
-authors = ["matthias314"]
 version = "0.1.1-DEV"
+authors = ["matthias314"]
 
 [deps]
 SmallCollections = "2b935e18-93d6-40ac-ae34-fe54c09f00e1"
+
+[sources]
+SmallCollections = {path = "../SmallCollections.jl"}
 
 [compat]
 BitIntegers = "0.3"
@@ -13,7 +16,8 @@ julia = "1.10"
 
 [extras]
 BitIntegers = "c3b6d118-76ef-56ca-8cc7-ebb389d030a1"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "BitIntegers"]
+test = ["Test", "Random", "BitIntegers"]
