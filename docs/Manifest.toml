@@ -1,8 +1,8 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.5"
+julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "4f46676b287ac16900620a57c177c083eee44b00"
+project_hash = "3f4d57b6d134b662f6323d89d00f3473da80f62e"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -56,9 +56,9 @@ version = "0.9.5"
 
 [[deps.Documenter]]
 deps = ["ANSIColoredPrinters", "AbstractTrees", "Base64", "CodecZlib", "Dates", "DocStringExtensions", "Downloads", "Git", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "MarkdownAST", "Pkg", "PrecompileTools", "REPL", "RegistryInstances", "SHA", "TOML", "Test", "Unicode"]
-git-tree-sha1 = "e25bc156a7e72f0a9f738815a4426dd01a7e914b"
+git-tree-sha1 = "47ffb8f27ffc01e2e57e7ae5365ae5ceef87b03d"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "1.13.0"
+version = "1.14.1"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
@@ -257,9 +257,9 @@ version = "1.11.0"
 
 [[deps.SmallCollections]]
 deps = ["BitIntegers", "CpuId", "Random"]
-path = "../../SmallCollections.jl"
+git-tree-sha1 = "c0e3cb5a0b75ced3bf62d8fe14a4cffc3f46a94b"
 uuid = "2b935e18-93d6-40ac-ae34-fe54c09f00e1"
-version = "0.5.0-DEV"
+version = "0.5.0"
 
     [deps.SmallCollections.extensions]
     BangBangExt = "BangBang"
@@ -273,7 +273,7 @@ version = "0.5.0-DEV"
 deps = ["SmallCollections"]
 path = ".."
 uuid = "4c2fb5cd-5fa8-4952-858b-935ef2e5e854"
-version = "0.1.0"
+version = "0.1.1"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
