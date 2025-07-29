@@ -6,12 +6,9 @@ authors = ["matthias314"]
 [deps]
 SmallCollections = "2b935e18-93d6-40ac-ae34-fe54c09f00e1"
 
-[sources]
-SmallCollections = {path = "../SmallCollections.jl"}
-
 [compat]
 BitIntegers = "0.3"
-SmallCollections = "0.5.0"
+SmallCollections = "0.5"
 julia = "1.10"
 
 [extras]
