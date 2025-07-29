@@ -16,7 +16,7 @@ The full documentation  for `SmallCombinatorics` is available
 
 ## Benchmarks
 
-The following benchmarks were done with Julia 1.11.5, Chairmarks.jl,
+The following benchmarks were done with Julia 1.11.5, Chairmarks.jl, SmallCombinatorics.jl v0.1.0,
 [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) 1.0.3
 and [Combinat.jl](https://github.com/jmichel7/Combinat.jl) 0.1.3.
 In separate tests, GAP and Sage were 2-3 orders of magnitude slower.
@@ -51,7 +51,7 @@ julia> n = 20; k = 10; @b sum(sum, SmallCombinatorics.combinations($n, $k))
 julia> n = 20; k = 10; @b sum(sum, Combinatorics.combinations(1:$n, $k))
 9.484 ms (369514 allocs: 25.373 MiB, 7.09% gc time)
 
-julia> n = 20; k = 10; @b sum(sum, Combinat.Combinations(1:$n, $k))  # Combinat.jl
+julia> n = 20; k = 10; @b sum(sum, Combinat.Combinations(1:$n, $k))
 9.605 ms (369521 allocs: 25.373 MiB, 7.04% gc time)
 ```
 
