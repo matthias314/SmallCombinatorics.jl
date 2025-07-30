@@ -6,9 +6,11 @@ This package provides functions for enumerative combinatorics. It was formerly a
 The functions in `SmallCombinatorics` are often much faster than their counterparts
 in other combinatorics packages. This is achieved by using the fast, non-allocating
 container types offered by `SmallCollections`. These types have a maximal capacity,
-which implies there are bounds on the input parameters for each function. At present,
-these bounds are hard-coded. For example, the function `permutations(n)` can produce
-permutations only for `n ≤ 16`.
+which implies there are bounds on the input parameters of the functions. At present,
+most bounds are hard-coded. For example, the function `permutations(n)` can produce
+permutations only for `n ≤ 16`. In contrast, the vector version `permutations(v)` works for any
+[`SmallVector`](https://matthias314.github.io/SmallCollections.jl/v0.5.0/smallvector/#SmallCollections.SmallVector)
+`v`, without length restriction.
 
 So far, the list of implemented functions is fairly short, but hopefully it will grow.
 The full documentation  for `SmallCombinatorics` is available
