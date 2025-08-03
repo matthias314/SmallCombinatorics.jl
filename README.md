@@ -18,9 +18,9 @@ The full documentation  for `SmallCombinatorics` is available
 
 ## Benchmarks
 
-The following benchmarks were done with Julia 1.11.5, Chairmarks.jl, SmallCombinatorics.jl v0.1.0,
+The following benchmarks were done with Julia 1.11.6, Chairmarks.jl, SmallCombinatorics.jl v0.1.1,
 [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl) 1.0.3
-and [Combinat.jl](https://github.com/jmichel7/Combinat.jl) 0.1.3.
+and [Combinat.jl](https://github.com/jmichel7/Combinat.jl) 0.1.4.
 In separate tests, GAP and Sage were 2-3 orders of magnitude slower.
 
 ### Permutations
@@ -30,14 +30,14 @@ The iterator returned by
 [`SmallCombinatorics.permutations`](https://matthias314.github.io/SmallCombinatorics.jl/stable/#SmallCombinatorics.permutations)
  yields each permutation as a `SmallVector{16,Int8}`.
 ```julia
-julia> n = 9; @b sum(p[1] for p in SmallCombinatorics.permutations($n))
-1.909 ms  # 688.006 μs with @inbounds(p[1])
+julia> n = 9; @b sum(@inbounds(p[1]) for p in SmallCombinatorics.permutations($n))
+683.524 μs
 
-julia> n = 9; @b sum(p[1] for p in Combinatorics.permutations(1:$n))
-14.535 s (725763 allocs: 44.297 MiB, 0.04% gc time, without a warmup)
+julia> n = 9; @b sum(@inbounds(p[1]) for p in Combinatorics.permutations(1:$n))
+14.171 s (725763 allocs: 44.297 MiB, 0.40% gc time, without a warmup)
 
-julia> n = 9; @b sum(p[1] for p in Combinat.Permutations($n))
-12.473 ms (725762 allocs: 44.297 MiB, 5.38% gc time)
+julia> n = 9; @b sum(@inbounds(p[1]) for p in Combinat.Permutations($n))
+13.309 ms (725762 allocs: 44.297 MiB, 11.81% gc time)
 ```
 
 ### Combinations
@@ -47,14 +47,14 @@ The iterator returned by
 [`SmallCombinatorics.combinations`](https://matthias314.github.io/SmallCombinatorics.jl/stable/#SmallCombinatorics.combinations-Tuple{Integer,%20Integer})
 yields each subset as a [`SmallBitSet`](https://matthias314.github.io/SmallCollections.jl/stable/smallbitset/#SmallCollections.SmallBitSet).
 ```julia
-julia> n = 20; k = 10; @b sum(sum, SmallCombinatorics.combinations($n, $k))
-1.121 ms
+julia> n = 20; k = 10; @b sum(first(c) for c in SmallCombinatorics.combinations($n, $k))
+378.624 μs
 
-julia> n = 20; k = 10; @b sum(sum, Combinatorics.combinations(1:$n, $k))
-9.484 ms (369514 allocs: 25.373 MiB, 7.09% gc time)
+julia> n = 20; k = 10; @b sum(first(c) for c in Combinatorics.combinations(1:$n, $k))
+9.064 ms (369514 allocs: 25.373 MiB, 6.34% gc time)
 
-julia> n = 20; k = 10; @b sum(sum, Combinat.Combinations(1:$n, $k))
-9.605 ms (369521 allocs: 25.373 MiB, 7.04% gc time)
+julia> n = 20; k = 10; @b sum(first(c) for c in Combinat.Combinations(1:$n, $k))
+7.768 ms (184765 allocs: 19.735 MiB, 2.41% gc time)
 ```
 
 ### Partitions
@@ -64,12 +64,12 @@ The iterator returned by
 [`SmallCombinatorics.partitions`](https://matthias314.github.io/SmallCombinatorics.jl/stable/#SmallCombinatorics.partitions)
  yields each permutation as a `SmallVector{64,Int8}`.
 ```julia
-julia> n = 40; @b sum(p[1] for p in SmallCombinatorics.partitions($n))
-425.938 μs  # 141.329 μs with @inbounds(p[1])
+julia> n = 40; @b sum(@inbounds(p[1]) for p in SmallCombinatorics.partitions($n))
+141.197 μs
 
-julia> n = 40; @b sum(p[1] for p in Combinatorics.integer_partitions($n))
-360.947 ms (3304541 allocs: 100.824 MiB, 28.44% gc time, without a warmup)
+julia> n = 40; @b sum(@inbounds(p[1]) for p in Combinatorics.integer_partitions($n))
+316.759 ms (3304541 allocs: 100.823 MiB, 24.99% gc time, without a warmup)
 
-julia> n = 40; @b sum(p[1] for p in Combinat.Partitions($n))
-2.917 ms (74678 allocs: 5.506 MiB)  # 2.562 ms (37340 allocs: 4.366 MiB) with @inbounds(p[1])
+julia> n = 40; @b sum(@inbounds(p[1]) for p in Combinat.Partitions($n))
+2.596 ms (37340 allocs: 4.366 MiB)
 ```
