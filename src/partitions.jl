@@ -96,19 +96,21 @@ end
     end
 end
 
-struct Partitions2
+struct Partitions2{V<:AbstractSmallVector}
     n::Int
     k::Int
 end
 
 """
     partitions(n::Integer, k::Integer)
+    partitions(::Type{V}, n::Integer, k::Integer) where {N, T <: Base.BitInteger, V <: AbstractSmallVector{N,T}}
 
 Return an iterator over the partitions of `n` into `k` parts.
 A partition of `n` is a weakly decreasing sequence of positive integers that add up to `n`.
-Each partition is of type `SmallVector{$PartN,$PartEltype}`, but this may change in the future.
+Each partition is of type `V <: AbstractSmallVector` if this type is specified.
+Otherwise, `V` is taken to be `SmallVector{$PartN,$PartEltype}`; this may change in the future.
 
-See also [`partitions(::Integer)`](@ref).
+See also [`partitions(::Integer)`](@ref), `Base.BitInteger`.
 
 # Examples
 ```jldoctest
@@ -119,6 +121,13 @@ julia> partitions(7, 3) |> collect
  [3, 3, 1]
  [3, 2, 2]
 
+julia> partitions(SmallVector{8,UInt8}, 7, 3) |> collect
+4-element Vector{SmallVector{8, UInt8}}:
+ [0x05, 0x01, 0x01]
+ [0x04, 0x02, 0x01]
+ [0x03, 0x03, 0x01]
+ [0x03, 0x02, 0x02]
+
 julia> partitions(7, 0) |> collect
 SmallVector{64, Int8}[]
 
@@ -127,37 +136,42 @@ julia> partitions(0, 0) |> collect
  0-element SmallVector{64, Int8}
 ```
 """
-function partitions(n::Integer, k::Integer)
-    (n >= 0 && k >= 0) || error("arguments must be non-negative")
-    n <= typemax(PartEltype) || error("only partitions of integers <= $(typemax(PartEltype)) are supported")
-    k <= PartN || error("only partitions into at most $PartN parts are supported")
-    Partitions2(n, k)
+partitions(::Integer, ::Integer),
+partitions(::Type{<:AbstractSmallVector{<:Any,<:Base.BitInteger}}, ::Integer, ::Integer)
+
+partitions(n::Integer, k::Integer) = partitions(SmallVector{PartN,PartEltype}, n, k)
+
+function partitions(::Type{V}, n::Integer, k::Integer) where {N, T <: Base.BitInteger, V <: AbstractSmallVector{N,T}}
+    (n >= 0 && k >= 0) || error("integer arguments must be non-negative")
+    n <= typemax(T) || error("only partitions of integers up to $(typemax(T)) are supported for $V")
+    k <= N || error("partitions into at most $N parts are supported for $V")
+    Partitions2{V}(n, k)
 end
 
-IteratorSize(::Type{Partitions2}) = Base.SizeUnknown()
+IteratorSize(::Type{<:Partitions2}) = Base.SizeUnknown()
 
-eltype(::Type{Partitions2}) = SmallVector{PartN,PartEltype}
+eltype(::Type{Partitions2{V}}) where V = V
 
-@inline function iterate(p::Partitions2)
+@inline function iterate(p::Partitions2{V}) where {N, T, V <: AbstractSmallVector{N,T}}
     (p.n < p.k || p.n > p.k == 0) && return nothing
-    v = MutableSmallVector{PartN,PartEltype}(undef, p.k)
+    v = MutableSmallVector{N,T}(undef, p.k)
     for i in eachindex(v)
-        @inbounds v[i] = (i == 1 ? p.n-p.k+1 : 1) % PartEltype
+        @inbounds v[i] = (i == 1 ? p.n-p.k+1 : 1) % T
     end
-    SmallVector(v), v
+    V(v), v
 end
 
-@inline function iterate(p::Partitions2, v)
+@inline function iterate(p::Partitions2{V}, v) where {N, T, V <: AbstractSmallVector{N,T}}
     @inbounds begin
         local c
-        if p.k == 0 || (c = v[1] - one(PartEltype); c <= v[p.k])
+        if p.k == 0 || (c = v[1] - one(T); c <= v[p.k])
             return nothing
         end
         i = findfirst(<(c), v)::Int
-        c = (v[i] += one(PartEltype))
+        c = (v[i] += one(T))
         # unsafe_copyto!(v, map(Fix2(min, c), v; style = RigidStyle()))  # allocates
         unsafe_copyto!(v, min.(fixedvector(v), c))
-        v[1] += p.n % PartEltype - sum_fast(v)
+        v[1] += p.n % T - sum_fast(v)
     end
-    SmallVector(v), v
+    V(v), v
 end
