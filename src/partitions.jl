@@ -10,18 +10,20 @@ const PartN = 64
 
 const PartEltype = Int8
 
-struct Partitions
+struct Partitions{V<:AbstractSmallVector}
     n::Int
 end
 
 """
     partitions(n::Integer)
+    partitions(::Type{V}, n::Integer) where {N, T <: Base.BitInteger, V <: AbstractSmallVector{N,T}}
 
 Return an iterator over the partitions of `n`.
 A partition of `n` is a weakly decreasing sequence of positive integers that add up to `n`.
-Each partition is of type `SmallVector{$PartN,$PartEltype}`, but this may change in the future.
+Each partition is of type `V <: AbstractSmallVector` if this type is specified.
+Otherwise, `V` is taken to be `SmallVector{$PartN,$PartEltype}`; this may change in the future.
 
-See also [`partitions(::Integer, ::Integer)`](@ref).
+See also [`partitions(::Integer, ::Integer)`](@ref), `Base.BitInteger`.
 
 # Examples
 ```jldoctest
@@ -31,41 +33,53 @@ julia> partitions(3) |> collect
  [2, 1]
  [1, 1, 1]
 
+julia> partitions(SmallVector{8,UInt8}, 3) |> collect
+3-element Vector{SmallVector{8, UInt8}}:
+ [0x03]
+ [0x02, 0x01]
+ [0x01, 0x01, 0x01]
+
 julia> partitions(0) |> collect
 1-element Vector{SmallVector{64, Int8}}:
  0-element SmallVector{64, Int8}
 ```
 """
-function partitions(n::Integer)
-    0 <= n <= PartN || error("argument must be between 0 and $(PartN)")
-    Partitions(n)
+partitions(::Integer),
+partitions(::Type{<:AbstractSmallVector{<:Any,<:Base.BitInteger}}, ::Integer)
+
+partitions(n::Integer) = partitions(SmallVector{PartN,PartEltype}, n)
+
+function partitions(::Type{V}, n::Integer) where {N, T <: Base.BitInteger, V <: AbstractSmallVector{N,T}}
+    M = min(N, typemax(T))
+    0 <= n <= M || error("argument must be between 0 and $M for $V")
+    Partitions{V}(n)
 end
 
-IteratorSize(::Type{Partitions}) = Base.SizeUnknown()
+IteratorSize(::Type{<:Partitions}) = Base.SizeUnknown()
 
-eltype(::Type{Partitions}) = SmallVector{PartN,PartEltype}
+eltype(::Type{Partitions{V}}) where V = V
 
-@inline function iterate(p::Partitions)
-    v = MutableSmallVector{PartN,PartEltype}()
+@inline function iterate(p::Partitions{V}) where {N, T, V <: AbstractSmallVector{N,T}}
+    v = MutableSmallVector{N,T}()
     # creating two separate MutableSmallVector below would lead to allocations
     if iszero(p.n)
-        SmallVector(v), (v, 0, PartEltype(0))
+        V(v), (v, 0, zero(T))
     else
-        @inbounds push!(v, p.n % PartEltype)
-        SmallVector(v), (v, 1-isone(p.n), PartEltype(isone(p.n)))
+        @inbounds push!(v, T(p.n))
+        V(v), (v, 1-isone(p.n), T(isone(p.n)))
     end
 end
 
-@inline function iterate(p::Partitions, (v, i, s)::Tuple{MutableSmallVector,Int,PartEltype})
+@inline function iterate(p::Partitions{V}, (v, i, s)::Tuple{MutableSmallVector,Int,T}) where {N, T, V <: AbstractSmallVector{N,T}}
     @inbounds if i == 0
         nothing
     elseif v[i] == 2
         v[i] = 1
-        push!(v, one(PartEltype))
-        SmallVector(v), (v, i-1, s+PartEltype(2))
+        push!(v, one(T))
+        V(v), (v, i-1, s+T(2))
     else
-        c = (v[i] -= one(PartEltype))
-        s += one(PartEltype)
+        c = (v[i] -= one(T))
+        s += one(T)
         while s >= c
             i += 1
             v[i] = c
@@ -73,11 +87,11 @@ end
         end
         if s == 0
             resize!(v, i)
-            SmallVector(v), (v, length(v), zero(PartEltype))
+            V(v), (v, length(v), zero(T))
         else
             resize!(v, i+1)
             v[i+1] = s
-            SmallVector(v), (v, length(v)-isone(s), PartEltype(isone(s)))
+            V(v), (v, length(v)-isone(s), T(isone(s)))
         end
     end
 end
