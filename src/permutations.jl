@@ -192,7 +192,7 @@ eltype(::Type{PermutationsParityTranspositionGenerator{V,SmallVector{N,PermEltyp
 end
 
 @inline function iterate(perm::PermutationsParityTransposition{SmallVector{N,T}}) where {N,T}
-    (perm.v, false, (0, 0)), (MutableSmallVector(perm.v), zeros(MutableSmallVector{N,PermEltype}, length(perm.v)), false)
+    (perm.v, false, (0, 0)), @inbounds (MutableSmallVector(perm.v), zeros(MutableSmallVector{N,PermEltype}, length(perm.v)), false)
 end
 
 @inline function iterate(perm::PermutationsParityTransposition, (p, c, s)::Tuple{MutableSmallVector,MutableSmallVector,Bool})
