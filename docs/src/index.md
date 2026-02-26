@@ -9,7 +9,8 @@ SmallCombinatorics
 ```
 # Partitions
 ```@docs
-partitions
+partitions(::Integer)
+partitions(::Integer, ::Integer)
 ```
 
 # Compositions
