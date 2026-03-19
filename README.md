@@ -42,7 +42,7 @@ julia> n = 9; @b sum(@inbounds(p[1]) for p in Combinat.Permutations($n))
 
 ### Combinations
 
-Loop over all `10`-element subsets of `1:20` and add up the sum of the elements of each subset.
+Loop over all `10`-element subsets of `1:20` and add up the first elements of these collections.
 The iterator returned by
 [`SmallCombinatorics.combinations`](https://matthias314.github.io/SmallCombinatorics.jl/stable/#SmallCombinatorics.combinations-Tuple{Integer,%20Integer})
 yields each subset as a [`SmallBitSet`](https://matthias314.github.io/SmallCollections.jl/stable/smallbitset/#SmallCollections.SmallBitSet).
