@@ -285,12 +285,15 @@ end
 """
     subsets(s::Union{SmallBitSet, AbstractSmallSet}, k::Integer)
     subsets(n::Integer, k::Integer)
+    subsets(s::Union{AbstractFixedOrSmallOrPackedVector, AbstractSmallSet})
 
 In the first form, return an iterator that yields all `k`-element subsets of the set `s`.
 The element type of the iterator is a `SmallBitSet` or `SmallSet`.
 If `k` is negative or larger than `length(s)`, then the iterator is empty.
 
 In the second form the set `s` is taken to be `SmallBitSet(1:n)`.
+
+In the third form, return an iterator that yeilds all subsets of the set `s`.
 
 See also [`subsets(::Integer)`](@ref),
 [`combinations`](@ref combinations(::Integer, ::Integer)),
@@ -342,6 +345,9 @@ eltype(::Type{Subsets2Int}) = SmallBitSet{UInt}
 eltype(::Type{Subsets2{S}}) where S <: SmallBitSet = S
 
 subsets(s::AbstractSmallSet, k::Integer) = combinations(s, k)
+
+subsets(c::Union{AbstractFixedOrSmallOrPackedVector, AbstractSmallSet}) =
+    Generator(Fix1(_inbounds_getindex, c), subsets(length(c)))
 
 # combinations
 
