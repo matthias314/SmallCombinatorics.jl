@@ -28,5 +28,6 @@ include("partitions.jl")
 include("compositions.jl")
 include("subsets.jl")
 include("permutations.jl")
+include("ldm.jl")
 
 end # module
