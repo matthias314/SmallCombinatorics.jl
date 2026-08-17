@@ -43,7 +43,7 @@ Random.rand(rng::AbstractRNG, ::SamplerType{Symbol}) = Symbol(rand(Char, 3)...)
 unsigned_types = (UInt8, UInt64, UInt256, UInt440)
 
 if isempty(ARGS)
-    push!(ARGS, "partitions.jl", "compositions.jl", "subsets.jl", "permutations.jl")
+    push!(ARGS, "partitions.jl", "compositions.jl", "subsets.jl", "permutations.jl", "ldm.jl")
 end
 
 foreach(include, ARGS)
