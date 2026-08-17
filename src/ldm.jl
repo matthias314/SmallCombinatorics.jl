@@ -63,12 +63,14 @@ The last argument must be a set type suitable for holding subsets of indices int
 `SmallBitSet{UInt8/16/32/64/128/256/512}` or `BitSet`. If an
 unsigned type `T` is supplied, `SmallBitSet{T}` will be used. `NoSubsets` can also be
 specified, then the subsets will not be computed, only their sums.
+This can save considerable time.
 
-Note that the default choice is not type stable, i.e. a suitable type is chosen
-depending on the cardinality of the set `numbers`. Crossing from data into types
+Note that the default choice is not type stable unless `numbers` is a fixed size
+vector type like `FixedVector` or `StaticVector`. That is, a suitable set type is chosen
+depending on the cardinality of `numbers`. Crossing from data into types
 is the definition of type instability. In critical code sections you
 should therefore supply a large enough type, or `BitSet`.
-E.g. `UInt64` if you know there are no more than 64 numbers in `numbers`.
+That is, use `UInt64` if you know there are no more than 64 numbers in `numbers`.
 
 A struct is returned with 3 fields:
 * value: the difference between the largest and smallest subset sum
@@ -98,18 +100,18 @@ function ldm(numbers::AbstractVector, ::Val{K}=Val(2),
              ::Type{ST}=settype(Val(length(numbers)))) where {K,ST<:AbstractSet}
     Base.require_one_based_indexing(numbers)
     heap = BinaryMaxHeap(LDMNode{K,ST}.(numbers, eachindex(numbers)))
-    ldm(Val(K), heap)
+    ldm(heap, Val(K))
 end
 
 function ldm(numbers::AbstractSet, ::Val{K}=Val(2),
              ::Type{ST} = typeof(numbers)) where {K,ST<:AbstractSet}
     heap = BinaryMaxHeap(LDMNode{K,ST}.(numbers))
-    ldm(Val(K), heap)
+    ldm(heap, Val(K))
 end
 
 
 #=
-"""ldm(::Val{K}, heap::AbstractHeap{VT}) where {K,VT}
+"""ldm(heap::AbstractHeap{VT}, ::Val{K}) where {K,VT}
 
 Variant of `ldm` which does not take a `numbers` vector, but a (max) heap
 with elements of type `VT`.  There must be extensions of the functions
@@ -126,7 +128,7 @@ This somewhat awkward interface can be of use if one has a heap which can be
 reused without allocations.
 """
 =#
-function ldm(::Val{K}, heap::AbstractHeap{VT}) where {K,VT}
+function ldm(heap::AbstractHeap{VT}, ::Val{K}) where {K,VT}
     K > 2 && (ix = MVector{K,Int}(undef))
     while length(heap) >= 2
         a = pop!(heap)

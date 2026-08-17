@@ -2,11 +2,14 @@
     for n in (1,2,6,8,14,31,48)
         s = rand(n)
         sv = FixedVector{n,eltype(s)}(s)
+        ss = SmallSet{n,eltype(sv)}(sv)
         for k in 1:4
             @inferred ldm(s, Val(k), UInt64)
             @inferred ldm(sv, Val(k))
+            @inferred ldm(ss, Val(k))
         end
         @inferred ldm(sv)
+        @inferred ldm(ss)
     end
 
     @test ldm(1:15).subsetsums === (60,60)
