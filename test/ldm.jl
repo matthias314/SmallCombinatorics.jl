@@ -1,6 +1,7 @@
 @testset "ldm" begin
     for n in (1,2,6,8,14,31,48)
         s = rand(n)
+        si = Int16.(rand(1:25, n))
         sv = FixedVector{n,eltype(s)}(s)
         ss = SmallSet{n,eltype(sv)}(sv)
         for k in 1:4
@@ -10,6 +11,8 @@
         end
         @inferred ldm(sv)
         @inferred ldm(ss)
+        p = @inferred ldm(si, Val(2), NoSubsets)
+        @test typeof(p) === SmallCombinatorics.LDMNode{Int16, 2, NoSubsets}
     end
 
     @test ldm(1:15).subsetsums === (60,60)
