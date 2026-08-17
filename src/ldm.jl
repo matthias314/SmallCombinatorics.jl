@@ -67,12 +67,12 @@ specified, then the subsets will not be computed, only their sums.
 Note that the default choice is not type stable, i.e. a suitable type is chosen
 depending on the cardinality of the set `numbers`. Crossing from data into types
 is the definition of type instability. In critical code sections you
-should therefore supply a large enough type, or BitSet.
+should therefore supply a large enough type, or `BitSet`.
 E.g. `UInt64` if you know there are no more than 64 numbers in `numbers`.
 
 A struct is returned with 3 fields:
 * value: the difference between the largest and smallest subset sum
-* subsets: a tuple with indices for each of the subsets
+* subsets: a tuple with sets of indices for each of the subsets
 * subsetsums: a tuple with the sums of the subsets
 
 
@@ -108,6 +108,7 @@ function ldm(numbers::AbstractSet, ::Val{K}=Val(2),
 end
 
 
+#=
 """ldm(::Val{K}, heap::AbstractHeap{VT}) where {K,VT}
 
 Variant of `ldm` which does not take a `numbers` vector, but a (max) heap
@@ -123,8 +124,8 @@ The heap will be modified and emptied (`pop!` and `push!`),
 and an element of it will be returned.
 This somewhat awkward interface can be of use if one has a heap which can be
 reused without allocations.
-
 """
+=#
 function ldm(::Val{K}, heap::AbstractHeap{VT}) where {K,VT}
     K > 2 && (ix = MVector{K,Int}(undef))
     while length(heap) >= 2
