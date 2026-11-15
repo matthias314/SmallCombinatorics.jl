@@ -1,5 +1,5 @@
 @testset "subsets(n,k)" begin
-    for n in [-1, 0, 1, 2, 10], k in [-1, 0, 1, n-1, n, n+1]
+    @testset for n in [-1, 0, 1, 2, 10], k in [-1, 0, 1, n-1, n, n+1]
         if n < 0
             @test_throws Exception subsets(n, k)
             continue
@@ -17,9 +17,9 @@
         @test unique(map(length, ssv)) == [k]
     end
 
-    for U in unsigned_types, a in map(SmallBitSet{U}, [Int[], [3], [bitsize(U)-3, bitsize(U)], [2, 4, 6, 7]])
+    @testset for U in unsigned_types, a in map(SmallBitSet{U}, [Int[], [3], [bitsize(U)-3, bitsize(U)], [2, 4, 6, 7]])
         n = length(a)
-        for k in [-1, 0, 1, n-1, n, n+1]
+        @testset for k in [-1, 0, 1, n-1, n, n+1]
             ss = @inferred subsets(a, k)
             if 0 <= k <= n
                 @test_inferred length(ss) binomial(n, k)
@@ -39,7 +39,7 @@
 end
 
 @testset "subsets(n)" begin
-    for n in [-1, 0, 1, 2, 10]
+    @testset for n in [-1, 0, 1, 2, 10]
         if n < 0
             @test_throws Exception subsets(n)
             continue
@@ -53,7 +53,7 @@ end
         @test_throws BoundsError ss[lastindex(ss)+1]
     end
 
-    for U in unsigned_types, a in map(SmallBitSet{U}, [Int[], [3], [bitsize(U)-3, bitsize(U)], [2, 4, 6, 7]])
+    @testset for U in unsigned_types, a in map(SmallBitSet{U}, [Int[], [3], [bitsize(U)-3, bitsize(U)], [2, 4, 6, 7]])
         ss = subsets(a)
         @test_inferred length(ss) 2^length(a)
         @test eltype(ss) == SmallBitSet{U}
@@ -89,7 +89,7 @@ end
         @test allunique(sh)
     end
 
-    for U in unsigned_types, (v, ks) in [(Int[], ()), (Int[], (0,)), (Int[], (0, 0)),
+    @testset for U in unsigned_types, (v, ks) in [(Int[], ()), (Int[], (0,)), (Int[], (0, 0)),
                 (bitsize(U)-4:2:bitsize(U), (1, 1, 1)),
                 (3:2:11, (5,)), (3:2:11, (2, 3)),  (3:2:11, (0, 2, 3)),  (3:2:11, (2, 0, 3)),  (3:2:11, (2, 3, 0)),
                 (20:2:38, (2, 3, 2, 3)), (20:2:38, (1, 4, 0, 2, 3))]
@@ -100,7 +100,7 @@ end
 
     @test_throws Exception setcompositions_parity(-1, 2)
     @test_throws Exception setcompositions_parity(bitsize(UInt)-1, 2)
-    for U in unsigned_types
+    @testset for U in unsigned_types
         @test_throws Exception setcompositions_parity(SmallBitSet{U}(2:2:6))
         @test_throws Exception setcompositions_parity(SmallBitSet{U}(2:2:6), -1, 2, 2)
         @test_throws Exception setcompositions_parity(SmallBitSet{U}(2:2:6), 3, 4)
@@ -134,7 +134,7 @@ end
         @test allunique(sh)
     end
 
-    for U in unsigned_types, (v, ks) in [(Int[], ()), (Int[], (0,)), (Int[], (0, 0)),
+    @testset for U in unsigned_types, (v, ks) in [(Int[], ()), (Int[], (0,)), (Int[], (0, 0)),
                 (bitsize(U)-4:2:bitsize(U), (1, 1, 1)),
                 (3:2:11, (5,)), (3:2:11, (2, 3)),  (3:2:11, (0, 2, 3)),  (3:2:11, (2, 0, 3)),  (3:2:11, (2, 3, 0)),
                 (20:2:38, (2, 3, 2, 3)), (20:2:38, (1, 4, 0, 2, 3))]
@@ -145,7 +145,7 @@ end
 
     @test_throws Exception setcompositions(-1, 2)
     @test_throws Exception setcompositions(bitsize(UInt)-1, 2)
-    for U in unsigned_types
+    @testset for U in unsigned_types
         @test_throws Exception setcompositions(SmallBitSet{U}(2:2:6))
         @test_throws Exception setcompositions(SmallBitSet{U}(2:2:6), -1, 2, 2)
         @test_throws Exception setcompositions(SmallBitSet{U}(2:2:6), 3, 4)
@@ -167,7 +167,7 @@ end
     sitr = subsets(s, k)
     N = 8
     T = Int8
-    for C in [SmallSet{N,T}, MutableSmallSet{N,T},
+    @testset for C in [SmallSet{N,T}, MutableSmallSet{N,T},
             FixedVector{N,T}, MutableFixedVector{N,T}, SmallVector{N,T}, MutableSmallVector{N,T},
             PackedVector{UInt64, 5, Int8}]
         c = C(s)

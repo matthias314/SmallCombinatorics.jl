@@ -4,7 +4,7 @@ using SmallCombinatorics: PermN, PermEltype
     @test_throws Exception permutations(-1)
     @test_throws Exception permutations(PermN+1)
 
-    for n in [0, 1, 2, 7]
+    @testset for n in [0, 1, 2, 7]
         p = @inferred permutations(n)
         @test_inferred eltype(p) SmallVector{PermN,PermEltype}
         @test_inferred length(p) factorial(n)
@@ -15,7 +15,7 @@ using SmallCombinatorics: PermN, PermEltype
 end
 
 VERSION >= v"1.11" && @testset "permutations(v)" begin
-    for V in [FixedVector, MutableFixedVector], N in [1, 2, 7], T in [Int8, UInt32, Char, Symbol]
+    @testset for V in [FixedVector, MutableFixedVector], N in [1, 2, 7], T in [Int8, UInt32, Char, Symbol]
         local v
         while true
             v = rand(V{N,T})
@@ -34,7 +34,7 @@ VERSION >= v"1.11" && @testset "permutations(v)" begin
         @test_inferred length(q) factorial(N)
     end
 
-    for V in [SmallVector, MutableSmallVector], N in [1, 2, 7], T in [Int8, UInt32, Char, Symbol]
+    @testset for V in [SmallVector, MutableSmallVector], N in [1, 2, 7], T in [Int8, UInt32, Char, Symbol]
         local v
         while true
             v = rand(V{N,T})
@@ -77,7 +77,7 @@ VERSION >= v"1.11" && @testset "permutations(v)" begin
 end
 
 VERSION >= v"1.11" && @testset "multi_permutations" begin
-    for V in [SmallVector, MutableSmallVector, FixedVector, MutableFixedVector], N in [1, 2, 3], T in [Bool, Int8, Char]
+    @testset for V in [SmallVector, MutableSmallVector, FixedVector, MutableFixedVector], N in [1, 2, 3], T in [Bool, Int8, Char]
         T == Bool && N > 2 && continue
         local w
         while true

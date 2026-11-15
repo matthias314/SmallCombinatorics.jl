@@ -1,7 +1,7 @@
 @testset "compositions" begin
     using SmallCombinatorics: CompN, CompEltype
 
-    for n in [-1, 0, 8], k in [-1, 0, 4, 8, 9, CompN+1]
+    @testset for n in [-1, 0, 8], k in [-1, 0, 4, 8, 9, CompN+1]
         if n < 0 || k < 0 || k > CompN
             @test_throws Exception weakcompositions(n, k)
             @test_throws Exception compositions(n, k)

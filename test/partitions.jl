@@ -1,7 +1,7 @@
 @testset "partitions" begin
     using SmallCombinatorics: PartN, PartEltype
 
-    for n in [-1, 0, 8, PartN+1]
+    @testset for n in [-1, 0, 8, PartN+1]
         if n < 0 || n > PartN
             @test_throws Exception partitions(n)
             continue
@@ -15,7 +15,7 @@
         n == 8 && @test length(v) == 22
     end
 
-    for n in [-1, 0, 20, typemax(PartEltype)+1], k in [-1, 0, 1, 10, 20, PartN+1]
+    @testset for n in [-1, 0, 20, typemax(PartEltype)+1], k in [-1, 0, 1, 10, 20, PartN+1]
         if !(0 <= n <= typemax(PartEltype) && 0 <= k <= PartN)
             @test_throws Exception partitions(n, k)
             continue
